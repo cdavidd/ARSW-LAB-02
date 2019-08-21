@@ -27,6 +27,7 @@ public class Consumer extends Thread{
         while (true) {
             synchronized(queue){
                 while (queue.isEmpty()) {
+                    queue.notifyAll();
                     try {
                         queue.wait();
                     } catch (InterruptedException ex) {
@@ -35,6 +36,12 @@ public class Consumer extends Thread{
                 }
                 int elem=queue.poll();
                 System.out.println("Consumer consumes "+elem);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Consumer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
             }
         }
     }

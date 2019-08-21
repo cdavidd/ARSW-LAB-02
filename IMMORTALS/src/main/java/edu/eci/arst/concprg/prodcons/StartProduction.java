@@ -22,8 +22,8 @@ public class StartProduction {
         
         Queue<Integer> queue=new LinkedBlockingQueue<>();
         
-        
-        new Producer(queue,Long.MAX_VALUE).start();
+        //Long.MAX_VALUE
+        new Producer(queue,4).start();
         
         //let the producer create products for 5 seconds (stock).
         try {
@@ -31,7 +31,6 @@ public class StartProduction {
         } catch (InterruptedException ex) {
             Logger.getLogger(StartProduction.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
         
         new Consumer(queue).start();
     }
