@@ -88,9 +88,10 @@ public class ControlFrame extends JFrame {
         btnPauseAndCheck.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
 
-                /*
-				 * COMPLETAR
-                 */
+                for (Immortal im : immortals) {
+                    im.setEnPausa(true);
+                }
+
                 int sum = 0;
                 for (Immortal im : immortals) {
                     sum += im.getHealth();
@@ -108,10 +109,12 @@ public class ControlFrame extends JFrame {
 
         btnResume.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                /**
-                 * IMPLEMENTAR
-                 */
-
+                synchronized (Immortal.immortalMonitor){
+                    for (Immortal im : immortals) {
+                        im.setEnPausa(false);
+                    }
+                    Immortal.immortalMonitor.notifyAll();
+                }
             }
         });
 

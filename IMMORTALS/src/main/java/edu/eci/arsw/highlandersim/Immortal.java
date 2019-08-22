@@ -15,7 +15,11 @@ public class Immortal extends Thread {
 
     private final String name;
 
+    private boolean enPausa;
+
     private final Random r = new Random(System.currentTimeMillis());
+
+    public static Object immortalMonitor = new Object();
 
 
     public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
@@ -25,34 +29,54 @@ public class Immortal extends Thread {
         this.immortalsPopulation = immortalsPopulation;
         this.health = health;
         this.defaultDamageValue=defaultDamageValue;
+        this.enPausa = false;
+    }
+
+    public void setEnPausa(boolean enPausa){
+        this.enPausa = enPausa;
     }
 
     public void run() {
 
         while (true) {
-            Immortal im;
+            if (!enPausa) {
+                Immortal im;
 
-            int myIndex = immortalsPopulation.indexOf(this);
+                int myIndex = immortalsPopulation.indexOf(this);
 
-            int nextFighterIndex = r.nextInt(immortalsPopulation.size());
+                int nextFighterIndex = r.nextInt(immortalsPopulation.size());
 
-            //avoid self-fight
-            if (nextFighterIndex == myIndex) {
-                nextFighterIndex = ((nextFighterIndex + 1) % immortalsPopulation.size());
+                //avoid self-fight
+                if (nextFighterIndex == myIndex) {
+                    nextFighterIndex = ((nextFighterIndex + 1) % immortalsPopulation.size());
+                }
+
+                im = immortalsPopulation.get(nextFighterIndex);
+
+                this.fight(im);
+
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                pausar();
             }
-
-            im = immortalsPopulation.get(nextFighterIndex);
-
-            this.fight(im);
-
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
         }
 
+    }
+
+    private void pausar(){
+        synchronized (immortalMonitor){
+            if (enPausa) {
+                try {
+                    immortalMonitor.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void fight(Immortal i2) {
