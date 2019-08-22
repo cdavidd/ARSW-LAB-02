@@ -117,4 +117,23 @@ option.*
 5. *Check the operation again 
 (click the button many times). Is the invariant fulfilled or not ?.*
 
+    La invariante aún no se está cumpliendo.
+
+6. *Identify possible critical regions in regards to the fight of the immortals.
+Implement a blocking strategy that avoids race conditions. Remember that if you 
+need to use two or more ‘locks’ simultaneously, you can use nested synchronized
+blocks:*
+
+7. *After implementing your strategy, start running your program, and pay attention to whether it comes to a halt.
+If so, use the jps and jstack programs to identify why the program stopped.*
+
+    Se utiliza la herramienta jstack para identificar porque el programa se detuvo.
+    
+    ![](img/deadlock.JPG)
+    
+    El programa se detuvo debido a que ocurrió un deadlock.
+
+8. *Consider a strategy to correct the problem identified above (you can review Chapter 15 of Java Concurrency in Practice again)*
+
+9. 
     
