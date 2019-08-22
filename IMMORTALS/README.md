@@ -1,3 +1,5 @@
+## Compile and run instructions
+
 ## Part I
 
 1) La siguiente imagen muestra el uso del CPU al correr el programa.
@@ -88,3 +90,31 @@ Este uso del CPU es debido a que el hilo de la clase `Consumer`
         System.out.println("Consumer consumes "+elem);
     }
     ```
+
+## Part II
+1.
+2. *Review the code and identify how the functionality indicated above was implemented. Given the intention of the game, an invariant
+should be that the sum of the life points of all
+players is always the same (of course, in an instant
+of time in which a time increase / reduction operation is not in
+process ). For this case, for N players, what 
+should this value be?*
+    
+    Para N jugadores la invariante sería la siguiente:
+     *N* * `DEFAULT_IMMORTAL_HEALTH`
+3. *Run the application and verify how the ‘pause and check’ option works. 
+Is the invariant fulfilled?*
+    
+    No, la suma de los puntos de vida de todos los jugadores se ve alterado,
+     disminuyen o aumentando de una forma aparentemente aleatoria.
+4. *A first hypothesis that the race condition for this function 
+(pause and check) is presented is that the program consults the list whose 
+values ​​it will print, while other threads modify their values. 
+To correct this, do whatever is necessary so that, before printing the current
+results, all other threads are paused. Additionally, implement the ‘resume’
+option.*
+
+5. *Check the operation again 
+(click the button many times). Is the invariant fulfilled or not ?.*
+
+    
