@@ -2,6 +2,8 @@ package edu.eci.arsw.highlandersim;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -13,7 +15,7 @@ public class Immortal extends Thread {
 
     private int defaultDamageValue;
 
-    private final List<Immortal> immortalsPopulation;
+    private final CopyOnWriteArrayList<Immortal> immortalsPopulation;
 
     private final String name;
 
@@ -22,8 +24,9 @@ public class Immortal extends Thread {
     public static final AtomicInteger cantidadPausados = new AtomicInteger(0);
 
     public static Object immortalMonitor = new Object();
+    private  volatile boolean  vivo=true;
 
-    public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
+    public Immortal(String name, CopyOnWriteArrayList<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
         super(name);
         this.updateCallback = ucb;
         this.name = name;
@@ -33,7 +36,7 @@ public class Immortal extends Thread {
     }
 
     public void run() {
-        while (true) {
+        while (vivo) {
             if (!ControlFrame.pausa) {
                 Immortal im;
 
@@ -47,13 +50,15 @@ public class Immortal extends Thread {
                 }
 
                 im = immortalsPopulation.get(nextFighterIndex);
-
+                
                 this.fight(im);
+                
                 try{
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                
             } else {
                 pausar();
             }
@@ -89,7 +94,8 @@ public class Immortal extends Thread {
 
         synchronized (immortalOne){
             synchronized (immortalTwo){
-                if (i2.getHealth() > 0) {
+                
+                if (i2.getHealth() > 0 && vivo) {
                     i2.changeHealth(i2.getHealth() - defaultDamageValue);
                     this.health += defaultDamageValue;
                     updateCallback.processReport("Fight: " + this + " vs " + i2 + "\n");
@@ -100,11 +106,12 @@ public class Immortal extends Thread {
         }
     }
 
-
-
-
     public void changeHealth(int v) {
         health = v;
+        if(v<=0){
+            vivo = false;
+            immortalsPopulation.remove(this);
+        }
     }
 
     public int getHealth() {
