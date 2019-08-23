@@ -1,11 +1,9 @@
 package edu.eci.arsw.highlandersim;
 
-import java.util.List;
+
 import java.util.Random;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Immortal extends Thread {
 
@@ -36,7 +34,7 @@ public class Immortal extends Thread {
     }
 
     public void run() {
-        while (vivo) {
+        while (vivo && !ControlFrame.stop) {
             if (!ControlFrame.pausa) {
                 Immortal im;
 

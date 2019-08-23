@@ -2,8 +2,6 @@ package edu.eci.arsw.highlandersim;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -20,7 +18,6 @@ import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.Color;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.swing.JScrollBar;
 
@@ -39,6 +36,7 @@ public class ControlFrame extends JFrame {
     private JTextField numOfImmortals;
     public static Object healthMonitor = new Object();
     public static boolean pausa = false;
+    public static boolean stop = false;
 
     /**
      * Launch the application.
@@ -135,6 +133,13 @@ public class ControlFrame extends JFrame {
         numOfImmortals.setColumns(10);
 
         JButton btnStop = new JButton("STOP");
+        btnStop.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                    stop = true;
+            }
+        });
+        
+        
         btnStop.setForeground(Color.RED);
         toolBar.add(btnStop);
 
