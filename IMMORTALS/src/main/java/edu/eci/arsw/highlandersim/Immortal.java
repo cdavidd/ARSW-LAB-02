@@ -2,44 +2,39 @@ package edu.eci.arsw.highlandersim;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Immortal extends Thread {
 
-    private ImmortalUpdateReportCallback updateCallback=null;
-    
+    private ImmortalUpdateReportCallback updateCallback = null;
+
     private int health;
-    
+
     private int defaultDamageValue;
 
     private final List<Immortal> immortalsPopulation;
 
     private final String name;
 
-    private boolean enPausa;
-
     private final Random r = new Random(System.currentTimeMillis());
+
+    public static final AtomicInteger cantidadPausados = new AtomicInteger(0);
 
     public static Object immortalMonitor = new Object();
 
-
     public Immortal(String name, List<Immortal> immortalsPopulation, int health, int defaultDamageValue, ImmortalUpdateReportCallback ucb) {
         super(name);
-        this.updateCallback=ucb;
+        this.updateCallback = ucb;
         this.name = name;
         this.immortalsPopulation = immortalsPopulation;
         this.health = health;
-        this.defaultDamageValue=defaultDamageValue;
-        this.enPausa = false;
-    }
-
-    public void setEnPausa(boolean enPausa){
-        this.enPausa = enPausa;
+        this.defaultDamageValue = defaultDamageValue;
     }
 
     public void run() {
-
         while (true) {
-            if (!enPausa) {
+            if (!ControlFrame.pausa) {
                 Immortal im;
 
                 int myIndex = immortalsPopulation.indexOf(this);
@@ -54,22 +49,22 @@ public class Immortal extends Thread {
                 im = immortalsPopulation.get(nextFighterIndex);
 
                 this.fight(im);
-
-                try {
+                try{
                     Thread.sleep(1);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            }else{
+            } else {
                 pausar();
             }
         }
 
     }
 
-    private void pausar(){
-        synchronized (immortalMonitor){
-            if (enPausa) {
+    private void pausar() {
+        avisar(); //Ultimo thread en pausar avisa que se puede obtener la vida
+        synchronized (immortalMonitor) {
+            if (ControlFrame.pausa) {
                 try {
                     immortalMonitor.wait();
                 } catch (InterruptedException e) {
@@ -79,21 +74,34 @@ public class Immortal extends Thread {
         }
     }
 
+    private void avisar(){
+        cantidadPausados.incrementAndGet();
+        synchronized (ControlFrame.healthMonitor){
+            if (cantidadPausados.get() == immortalsPopulation.size()){
+                ControlFrame.healthMonitor.notify();
+            }
+        }
+    }
+
     public void fight(Immortal i2) {
-        synchronized (this){
-            synchronized (i2){
+       Immortal immortalOne = getId() > i2.getId() ? this : i2;
+       Immortal immortalTwo = getId() > i2.getId() ? i2 : this;
+
+        synchronized (immortalOne){
+            synchronized (immortalTwo){
                 if (i2.getHealth() > 0) {
                     i2.changeHealth(i2.getHealth() - defaultDamageValue);
                     this.health += defaultDamageValue;
-                    updateCallback.processReport("Fight: " + this + " vs " + i2+"\n");
+                    updateCallback.processReport("Fight: " + this + " vs " + i2 + "\n");
                 } else {
                     updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
                 }
             }
         }
-
-
     }
+
+
+
 
     public void changeHealth(int v) {
         health = v;
