@@ -1,5 +1,10 @@
 ## Compile and run instructions
-
+Entrar al directorio `ARSW-LAB-02/IMMORTALS`:
+* **Para compilar:** Ejecutar `mvn package`
+* **Para ejecutar StartProduction:** Ejecutar `mvn exec:java -Dexec.mainClass="edu.eci.arst.concprg.prodcons.StartProduction"`
+* **Para ejecutar ControlFrame (Immortals):** Ejecutar `mvn exec:java -Dexec.mainClass="edu.eci.arsw.highlandersim.ControlFrame"`
+* **Para ejecutar las pruebas:** Ejecutar `mvn test` 
+                                      
 ## Part I
 
 1) La siguiente imagen muestra el uso del CPU al correr el programa.
