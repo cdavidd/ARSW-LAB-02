@@ -136,6 +136,15 @@ public class ControlFrame extends JFrame {
         btnStop.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                     stop = true;
+                    btnPauseAndCheck.setEnabled(false);
+                    btnResume.setEnabled(false);
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    System.err.println("Error stopping");
+                }
+                output.selectAll();
+                    output.replaceSelection("");
             }
         });
         
