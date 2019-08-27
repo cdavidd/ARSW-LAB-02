@@ -81,7 +81,7 @@ public class Immortal extends Thread {
         cantidadPausados.incrementAndGet();
         synchronized (ControlFrame.healthMonitor){
             if (cantidadPausados.get() == immortalsPopulation.size()){
-                ControlFrame.healthMonitor.notify();
+                ControlFrame.healthMonitor.notifyAll();
             }
         }
     }

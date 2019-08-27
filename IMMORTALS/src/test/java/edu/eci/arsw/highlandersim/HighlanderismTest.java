@@ -21,7 +21,7 @@ public class HighlanderismTest {
 
     @Before
     public void setup(){
-        n = 85;
+        n = 1000;
         health = 100;
         defaultDamage = 10;
         invariant = n * health;
