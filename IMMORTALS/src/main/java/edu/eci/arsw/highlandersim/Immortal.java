@@ -92,7 +92,6 @@ public class Immortal extends Thread {
 
         synchronized (immortalOne){
             synchronized (immortalTwo){
-                
                 if (i2.getHealth() > 0 && vivo) {
                     i2.changeHealth(i2.getHealth() - defaultDamageValue);
                     this.health += defaultDamageValue;
