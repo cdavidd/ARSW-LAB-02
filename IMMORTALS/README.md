@@ -97,7 +97,11 @@ Este uso del CPU es debido a que el hilo de la clase `Consumer`
     ```
 
 ## Part II
-1.
+1. *Review the “highlander-simulator” program, provided in the edu.eci.arsw.highlandersim package. This is a game in which:*
+    * You have N immortal players. 
+    * Each player knows the remaining N-1 player.
+    * Each player permanently attacks some other immortal. The one who first attacks subtracts M life points from his opponent, and increases his own life points by the same amount. 
+    * The game could never have a single winner. Most likely, in the end there are only two left, fighting indefinitely by removing and adding life points. 
 2. *Review the code and identify how the functionality indicated above was implemented. Given the intention of the game, an invariant
 should be that the sum of the life points of all
 players is always the same (of course, in an instant
@@ -119,6 +123,8 @@ To correct this, do whatever is necessary so that, before printing the current
 results, all other threads are paused. Additionally, implement the ‘resume’
 option.*
 
+    Se utilizaron monitores y un entero atómico para determinar cuando todos los hilos estaban pausados para así poder obtener la vida de cada uno.
+
 5. *Check the operation again 
 (click the button many times). Is the invariant fulfilled or not ?.*
 
@@ -128,6 +134,8 @@ option.*
 Implement a blocking strategy that avoids race conditions. Remember that if you 
 need to use two or more ‘locks’ simultaneously, you can use nested synchronized
 blocks:*
+
+    El método `fight()` en la clase `Immortal` se consideró como una región critica. 
 
 7. *After implementing your strategy, start running your program, and pay attention to whether it comes to a halt.
 If so, use the jps and jstack programs to identify why the program stopped.*
@@ -141,18 +149,61 @@ If so, use the jps and jstack programs to identify why the program stopped.*
 8. *Consider a strategy to correct the problem identified above 
 (you can review Chapter 15 of Java Concurrency in Practice again)*
 
+    La estrategia utilizada para evitar el deadlock fue mantener el orden en el cual los objetos obtienen el bloqueo, a continuación, se muestra cómo se implementó:
+
+    Clase `Immortal`:
+    ```java
+    public void fight(Immortal i2) {
+       Immortal immortalOne = getId() > i2.getId() ? this : i2;
+       Immortal immortalTwo = getId() > i2.getId() ? i2 : this;
+
+        synchronized (immortalOne){
+            synchronized (immortalTwo){
+                if (i2.getHealth() > 0 && vivo) {
+                    i2.changeHealth(i2.getHealth() - defaultDamageValue);
+                    this.health += defaultDamageValue;
+                    updateCallback.processReport("Fight: " + this + " vs " + i2 + "\n");
+                } else {
+                    updateCallback.processReport(this + " says:" + i2 + " is already dead!\n");
+                }
+            }
+        }
+    }
+    ```
+
 9. *Once the problem is corrected, rectify that the program continues to 
 function consistently when 100, 1000 or 10000 immortals are executed.
 If in these large cases the invariant begins to be breached again, 
 you must analyze what was done in step 4.*
     
-   dawdjawj
+   El invariante no cambio al crear 10, 100 y 1000 hilos.
    
 10. *An annoying element for the simulation is that at a certain point in it there are few living
  'immortals' making failed fights with 'immortals' already dead.
  It is necessary to suppress the immortal dead of the simulation as they die.*
+    
+    Respuesta en ANSWER.txt
     1. Analyzing the simulation operation scheme, could this create a race condition? Implement the functionality, run the simulation and see what problem arises when there are many 'immortals' in it. Write your conclusions about it in the file ANSWERS.txt. 
     2. Correct the previous problem WITHOUT using synchronization, since making access to the shared list of immortals sequential would make simulation extremely slow.
 
 11.  *To finish, implement the STOP option.*
-    
+
+Cada hilo se detiene al momento de realizar la acción de stop.
+
+```java
+JButton btnStop = new JButton("STOP");
+btnStop.addActionListener(new ActionListener() {
+    public void actionPerformed(ActionEvent e) {
+            stop = true;
+            btnPauseAndCheck.setEnabled(false);
+            btnResume.setEnabled(false);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ex) {
+            System.err.println("Error stopping");
+        }
+        output.selectAll();
+            output.replaceSelection("");
+    }
+});
+```

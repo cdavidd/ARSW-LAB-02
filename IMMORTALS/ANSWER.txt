@@ -1,0 +1,9 @@
+Analyzing the simulation operation scheme, could this create a race 
+condition? Implement the functionality, run the 
+simulation and see what problem arises when there are 
+many 'immortals' in it. Write your conclusions about it 
+in the file ANSWERS.txt.
+
+* No se genera una condición de carrera debido a que utilizamos 
+una clase ThreadSafe la cual no realiza ningún tipo
+de bloqueo.
